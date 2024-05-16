@@ -1,0 +1,129 @@
+import openpyxl
+from google.colab import drive
+
+#abre el drive
+drive.mount('/content/drive')
+
+
+def diccionario(a):
+      '''crea diccionario de traduccion, recibe dos columnas de excel'''
+      #abre el excel y lee la primer hoja
+      notas = openpyxl.load_workbook(a)
+      shit = notas.active
+
+
+
+      #crea las listas con las columnas A y B, incluye ceros a la izquierda
+      letras = [celda.value for celda in shit['A']]
+
+      codigo = [celda.value for celda in shit['B']]
+
+      #elimina colados
+      codigo.pop(0)
+      codigo.pop(len(codigo) - 1)
+      letras.pop(0)
+      letras.pop(len(letras) - 1)
+
+      #crea el diccionario para decodificar
+      dic = dict(zip(codigo, letras))
+      return dic
+
+
+def txt_lector(a):
+      '''abre blogs de notas y cambia de enteros a lista de strings'''
+      with open(a, 'r') as file:
+          numerote = file.read()
+      lista = []
+      #de str a lista
+      for i in numerote:
+          lista.append(i)
+      return lista
+
+
+def decodificador(dicc, numero):
+      '''decodifica, recibe el diccionario de traduccion en excel y el codigo a decodificar en blog de notas'''
+      #diccionario de decodificacion
+      diccc = diccionario(dicc)
+      #codigo en clave binaria
+      numerote = txt_lector(numero)
+
+
+      lista = []
+      lista2 = []
+      lista3 = []
+      #intenta con los primeros digitos hasta encontrar una coincidencia en el diccionario
+      for i in numerote:
+          lista.append(i)
+          lista2 = ''.join(lista) #de lista a str
+          if lista2 in diccc:
+              lista3.append(diccc[lista2])
+              lista = [] #reinicio cuando hay coincidencia
+      lista3 = ''.join(lista3)
+
+
+
+      return lista3
+
+
+def diccionario2(a):
+      '''crea diccionario de traduccion, recibe dos columnas de excel'''
+
+      #mismas funciones que diccionario pero al revez los elementos en el diccionario
+      notas = openpyxl.load_workbook(a)
+      shit = notas.active
+
+
+      letras = [celda.value for celda in shit['A']]
+
+      codigo = [celda.value for celda in shit['B']]
+
+
+      codigo.pop(0)
+      codigo.pop(len(codigo) - 1)
+      letras.pop(0)
+      letras.pop(len(letras) - 1)
+
+      #lo que decia, estan al reves las listas
+      dic = dict(zip(letras, codigo))
+      return dic
+
+
+def txt_lector2(a):
+      '''abre blogs de notas y cambia de str a lista de strings'''
+      with open(a, 'r') as file:
+          mensajote = file.read()
+      lista = []
+      #de str a lista
+      for i in mensajote:
+          lista.append(i)
+      return lista
+
+
+def codificador(dicc, mensaje):
+      '''codifica, recibe el diccionario de traduccion en excel y el codigo a codificar en blog de notas'''
+
+      #diccionario de codificacion
+      diccc = diccionario2(dicc)
+
+      #mensaje sin codificar
+      mensajote = txt_lector2(mensaje)
+      
+
+
+      lista3 = []
+      # es mas simple el regreso, solo busca la letra para cambiarla a binario
+      for i in mensajote:
+          lista3.append(diccc[i])
+          #registra cada letra
+      lista3 = ''.join(lista3)
+      return lista3
+
+
+#mensaje decodificado
+mensaje = decodificador('/content/drive/My Drive/Code.xlsx', '/content/drive/My Drive/Mensaje1.txt')
+print(mensaje)
+
+
+#mensaje codificado
+codigo1 = codificador('/content/drive/My Drive/Code.xlsx', '/content/drive/My Drive/Mensaje.txt')
+print(codigo1)
